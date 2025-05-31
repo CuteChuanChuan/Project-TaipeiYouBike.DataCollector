@@ -1,0 +1,28 @@
+application.*.conf
+!application.conf
+
+# sbt specific
+target/
+project/target/
+project/project/
+
+# IntelliJ specific
+.idea/
+*.iml
+*.iws
+out/
+
+# Scala specific
+*.class
+.cache/
+lib_managed/
+src_managed/
+dist/
+logs/
+.DS_Store
+.metals/
+.bloop/
+.vscode/
+.worksheet/
+
+.bsp/
