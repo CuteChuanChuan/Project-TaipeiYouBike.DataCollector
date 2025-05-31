@@ -17,15 +17,16 @@ class YouBikeCollector()(implicit system: ActorSystem[_]) {
   private implicit val ec:   ExecutionContext  = system.executionContext
   private val logger:        Logger            = LoggerFactory.getLogger(this.getClass)
   private val stationRepo:   StationRepository = new StationRepository(new ScdProcessor())
-  private val dataProcessor: DataProcessor     = new DataProcessor(stationRepo)
+  private val dataProcessor: DataProcessor     = new DataProcessor
 
   def startScheduledCollecting(): Unit = {
     val fetchInterval = ConfigHelper.fetchApiConfig.fetchInterval
+    val retrievedTime = ZonedDateTime.now()
 
     system.scheduler.scheduleAtFixedRate(0.seconds, fetchInterval) { () =>
       logger.info(s"Executing scheduled collection at: ${ZonedDateTime.now()}")
 
-      collectThenProcess().onComplete {
+      collectThenProcess(retrievedTime).onComplete {
         case Success(_)         =>
           logger.info("Scheduled collection completed successfully")
         case Failure(exception) =>
@@ -34,19 +35,24 @@ class YouBikeCollector()(implicit system: ActorSystem[_]) {
     }
   }
 
-  private def collectThenProcess()(implicit system: ActorSystem[_]): Future[Unit] =
+  private def collectThenProcess(retrievedTime: ZonedDateTime)(implicit system: ActorSystem[_]): Future[Unit] =
     for {
-      stations <- collectData()
-      _ = processData(stations)
+      stations <- collectThenParseData()
+      _ = processThenInsertData(stations, retrievedTime)
     } yield ()
 
-  private def collectData()(implicit system: ActorSystem[_]): Future[List[Station]] =
+  private def collectThenParseData()(implicit system: ActorSystem[_]): Future[List[Station]] =
     for {
       rawData <- new ApiFetcher()(system).fetchApi()
       stations = RawJsonParser.parseJsonData(rawData)
     } yield stations
 
-  private def processData(stations: List[Station]): Future[Unit] =
-    dataProcessor.processStations(stations)
+  private def processThenInsertData(stations: List[Station], retrievedTime: ZonedDateTime): Future[Unit] = {
+    val (fctRecords, dimRecords) = dataProcessor.convertStationsToModels(stations, retrievedTime)
+    for {
+      _ <- stationRepo.insertStationFacts(fctRecords)
+      _ <- stationRepo.insertStationDims(dimRecords, retrievedTime)
+    } yield ()
+  }
 
 }

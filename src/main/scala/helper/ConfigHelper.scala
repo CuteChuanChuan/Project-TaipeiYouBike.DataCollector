@@ -1,7 +1,6 @@
 package helper
 
 import com.typesafe.config.{ Config, ConfigFactory }
-import models.enums.CollectionsUsed
 import models.{ ApiConfig, MongoConfig }
 import org.slf4j.{ Logger, LoggerFactory }
 
@@ -25,10 +24,8 @@ object ConfigHelper {
     MongoConfig(
       uri = determineMongoUri(mongoConfig),
       database = mongoConfig.getString("database"),
-      collections = Map(
-        CollectionsUsed.DIM -> mongoConfig.getString("collections.dim"),
-        CollectionsUsed.FCT -> mongoConfig.getString("collections.fct")
-      )
+      dimCollection = mongoConfig.getString("collections.dim"),
+      fctCollection = mongoConfig.getString("collections.fct")
     )
   }
 

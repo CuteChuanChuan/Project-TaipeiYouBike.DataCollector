@@ -1,7 +1,6 @@
 package repositories
 
 import helper.ConfigHelper
-import models.enums.CollectionsUsed
 import models.{ ChangeSets, DocFields, MongoConfig, ScdMetadata, StationDim, StationDimWithScd, StationFct }
 import org.bson.Document
 import org.mongodb.scala.model.{ Filters, Updates }
@@ -21,10 +20,8 @@ class StationRepository(private val scdProcessor: ScdProcessor)(implicit ec: Exe
   private val mongoConfig:   MongoConfig               = ConfigHelper.fetchMongoConfig
   private val mongoClient:   MongoClient               = MongoClient(mongoConfig.uri)
   private val database:      MongoDatabase             = mongoClient.getDatabase(mongoConfig.database)
-  private val dimCollection: MongoCollection[Document] =
-    database.getCollection(mongoConfig.collections(CollectionsUsed.DIM))
-  private val fctCollection: MongoCollection[Document] =
-    database.getCollection(mongoConfig.collections(CollectionsUsed.FCT))
+  private val dimCollection: MongoCollection[Document] = database.getCollection(mongoConfig.dimCollection)
+  private val fctCollection: MongoCollection[Document] = database.getCollection(mongoConfig.fctCollection)
 
   def insertStationFacts(facts: Seq[StationFct]): Future[Unit] = {
     val docs: Seq[Document] = facts.map(DocumentConverter.fctToDocument)
