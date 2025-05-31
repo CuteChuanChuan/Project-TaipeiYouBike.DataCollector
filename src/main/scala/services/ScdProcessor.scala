@@ -1,6 +1,6 @@
 package services
 
-import models.{ClosedMetadataValues, ScdMetadata, StationDim}
+import models.{ ClosedMetadataValues, ScdMetadata, StationDim }
 
 import java.time.ZonedDateTime
 

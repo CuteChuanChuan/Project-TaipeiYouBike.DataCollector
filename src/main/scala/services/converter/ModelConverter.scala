@@ -1,10 +1,10 @@
 package services.converter
 
-import models.{DocFields, ScdMetadata, Station, StationDim, StationFct}
+import models.{ DocFields, ScdMetadata, Station, StationDim, StationFct }
 import org.bson.Document
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
+import java.time.{ LocalDateTime, ZoneId, ZonedDateTime }
 
 /** Object responsible for converting data from API or MongoDB documents to models
   */

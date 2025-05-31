@@ -1,12 +1,11 @@
 package services.converter
 
-import models.{DocFields, ScdMetadata, StationDim, StationFct}
+import models.{ DocFields, ScdMetadata, StationDim, StationFct }
 import org.bson.Document
-import org.mongodb.scala.bson.{BsonBoolean, BsonDouble, BsonInt32, BsonString}
+import org.mongodb.scala.bson.{ BsonBoolean, BsonDouble, BsonInt32, BsonString }
 
 import java.time.format.DateTimeFormatter
-import java.time.{ZoneId, ZonedDateTime}
-
+import java.time.{ ZoneId, ZonedDateTime }
 
 object DocumentConverter {
 
